@@ -2,8 +2,8 @@
 Search arxiv article metadata for word1 and word2, published between fromdate and todate,
  then search their PDF text for pdf_search_phrase.
 """
-word1  = "dyson"
-word2 = "sphere"
+
+abstract_words = ["dyson", "sphere"]
 fromdate = "199101010000"
 todate = "202412312359"
 pdf_search_phrase = "extraterrestrial technology"
@@ -35,7 +35,7 @@ def get_pdf_links(api_url):
     return pdf_data
 
 def get_phrase_context(text, phrase, window=5):
-    """Extracts context (5 words before/after) for the table."""
+    """Extracts context (5 words before/after)"""
     results = []
     clean_text = re.sub(r'\s+', ' ', text)
     words = clean_text.split()
@@ -90,9 +90,14 @@ def analyze_pdf(pdf_url, phrase):
         return None
 
 def main():
+    search_query = f"search_query="
+    for i, word in enumerate(abstract_words):
+        search_query = f"{search_query}all:{word}+AND+"
+
+    search_query = f"{search_query}submittedDate:[{fromdate}+TO+{todate}]"
     api_url = (
         "http://export.arxiv.org/api/query?"
-        f"search_query=all:{word1}+AND+all:{word2}+AND+submittedDate:[{fromdate}+TO+{todate}]"
+        f"{search_query}"
         "&max_results=999"
         "&sortBy=submittedDate"
         "&sortOrder=descending"
